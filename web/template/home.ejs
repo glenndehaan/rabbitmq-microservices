@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>RabbitMQ Microservices</title>
+
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimal-ui">
+
+        <meta name="description" content="RabbitMQ Microservices">
+        <meta name="author" content="Glenn de Haan">
+
+        <meta property="og:title" content="RabbitMQ Microservices"/>
+        <meta property="og:type" content="website"/>
+        <meta property="og:description" content="RabbitMQ Microservices"/>
+    </head>
+    <body>
+        <h1>RabbitMQ Microservices</h1>
+        <h2>Input</h2>
+        <textarea id="input" cols="60" rows="10">{"first": "1", "second": "2", "last": "3"}</textarea><br/>
+        <button id="submit">Submit</button>
+        <h2>Output</h2>
+        <div>Status: <span id="status">Waiting for submit...</span></div><br/>
+        <div>UUID: <span id="uuid"></span></div><br/>
+        <textarea id="output" cols="60" rows="10" disabled></textarea>
+
+        <script type="application/javascript">
+            const input = document.querySelector('#input');
+            const output = document.querySelector('#output');
+            const submit = document.querySelector('#submit');
+            const status = document.querySelector('#status');
+            const uuid = document.querySelector('#uuid');
+            let poller = null;
+
+            submit.addEventListener("click", () => {
+                fetch('http://localhost:4000/api/input', {
+                    method: "POST",
+                    cache: "no-cache",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        data: JSON.parse(input.value)
+                    })
+                }).then((res) => {
+                    return res.json();
+                }).then((data) => {
+                    status.innerHTML = "Input send! Waiting for output...";
+                    uuid.innerHTML = data.uuid;
+
+                    poller = setInterval(() => {
+                        fetch(`http://localhost:4000/api/poll/${data.uuid}`, {
+                            method: "GET",
+                            cache: "no-cache"
+                        }).then((res) => {
+                            return res.json();
+                        }).then((data) => {
+                            if(data.data !== null) {
+                                clearInterval(poller);
+                                status.innerHTML = "Output Received!";
+                                output.value = JSON.stringify(data.data);
+                            }
+                        });
+                    }, 2500);
+                });
+            });
+        </script>
+    </body>
+</html>
