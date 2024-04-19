@@ -25,21 +25,25 @@ const run = async () => {
 
     rabbitmqChannel.consume('local_special_worker', (message) => {
         const json = JSON.parse(message.content.toString());
-        console.log(`[RabbitMQ][${json.meta.uuid}] Message Received: ${JSON.stringify(json.data)}`);
+        console.log(`[RabbitMQ][${json.meta.uuid}] Message Received: ${JSON.stringify(json)}`);
 
         // App logic here
         setTimeout(() => {
-            const reverse = Object.fromEntries(
-                Object
-                    .entries(json.data)
-                    .map(([key, value]) => [value, key])
-            );
+            if(json.meta.job === 'reverse') {
+                const reverse = Object.fromEntries(
+                    Object
+                        .entries(json.data)
+                        .map(([key, value]) => [value, key])
+                );
 
-            rabbitmqChannel.publish('local_exchange', 'local_api_worker', Buffer.from(JSON.stringify({
-                meta: json.meta,
-                data: reverse
-            })));
-            rabbitmqChannel.ack(message);
+                rabbitmqChannel.publish('local_exchange', 'local_api_worker', Buffer.from(JSON.stringify({
+                    meta: {
+                        uuid: json.meta.uuid
+                    },
+                    data: reverse
+                })));
+                rabbitmqChannel.ack(message);
+            }
         }, 5000);
     });
 };

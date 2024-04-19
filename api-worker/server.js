@@ -42,7 +42,7 @@ const run = async () => {
 
     rabbitmqChannel.consume('local_api_worker', (message) => {
         const json = JSON.parse(message.content.toString());
-        console.log(`[RabbitMQ][${json.meta.uuid}] Message Received: ${JSON.stringify(json.data)}`);
+        console.log(`[RabbitMQ][${json.meta.uuid}] Message Received: ${JSON.stringify(json)}`);
 
         // App logic here
         redisClient.set(json.meta.uuid, JSON.stringify(json.data));

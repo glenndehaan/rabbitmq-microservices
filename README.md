@@ -59,6 +59,16 @@ The Special Worker Service handles specialized tasks within the system that requ
 
 5. **Test the Application**: Test the functionality of the microservices by opening the Web Service page and verifying that the expected behavior is observed across the system.
 
+## RabbitMQ Management Interface
+
+The RabbitMQ management interface provides a web-based tool for monitoring and managing RabbitMQ, including queues, exchanges, and connections. Here's how to access it:
+
+1. **Access the Interface**: Open a web browser and navigate to [http://localhost:15672](http://localhost:15672).
+
+2. **Log In**: Use the following default credentials to log in:
+    - Username: guest
+    - Password: guest
+
 ## License
 
 MIT

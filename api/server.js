@@ -65,7 +65,8 @@ app.post('/api/input', (req, res) => {
     const uuid = uuidv4();
     rabbitmqChannel.publish('local_exchange', 'local_special_worker', Buffer.from(JSON.stringify({
         meta: {
-            uuid
+            uuid,
+            job: 'reverse'
         },
         data: req.body.data
     })));
